@@ -26,10 +26,10 @@ def random_change_char(string, value):
 
 
 def tree(height=13, screen_width=80):
-    star = (STAR, 3*STAR)
+    star = (STAR, 3 * STAR)
     if height % 2 != 0:
         height += 1
-    body = ['/_\\', '/_\_\\']
+    body = ['/_\\', '/_\\_\\']
     trunk = '[___]'
     begin = '/'
     end = '\\'
@@ -49,7 +49,7 @@ def tree(height=13, screen_width=80):
 
 def balls(tree):
     for idx, _ in enumerate(tree[:-3], 2):
-        tree[idx] = random_change_char(tree[idx], len(tree[idx])//8)
+        tree[idx] = random_change_char(tree[idx], len(tree[idx]) // 8)
     return tree
 
 
@@ -68,29 +68,32 @@ def colored_stars_balls(tree):
 def cli():
     parser = argparse.ArgumentParser(prog="Python Christmas Tree by Chico Lucio from Ciencia Programada",
                                      epilog="Ctrl-C interrupts the Christmas :-(")
-    parser.add_argument('-s', '--size', default=13, type=int,
-                        help="Tree height. If even it will be subtracted 1. If less than 7, considered 5. Default: 13")
-    parser.add_argument('-w', '--width', default=80, type=int,
-                        help="Screen width. Used to center the tree. Default: 80")
-    parser.add_argument('-t', '--terminal', action='store_true',
-                        help="Uses the terminal size to center the tree. -s and -w will be ignored")
+
+    # Removed size and width arguments since we will use terminal size
     args = parser.parse_args()
 
-    if args.terminal:
-        screen_width, height = os.get_terminal_size()
-        height -= 2
-    else:
-        height = args.size
-        screen_width = args.width
-    while True:
-        try:
+    # Get terminal size
+    screen_width, height = os.get_terminal_size()
+    
+    # Set height to a minimum of 5
+    height = max(5, height - 2)  # Subtracting 2 to account for terminal borders
+
+    # Hide cursor
+    print("\033[?25l", end='')
+
+    try:
+        while True:
             time.sleep(random.uniform(.1, 1))
             os.system('cls' if os.name == 'nt' else 'clear')
             print('\n'.join(colored_stars_balls(balls(tree(height, screen_width)))))
-        except KeyboardInterrupt:
-            os.system('cls' if os.name == 'nt' else 'clear')
-            print(f"\n{'Merry Christmas!!':^{screen_width}}", end='\n\n')
-            break
+    
+    except KeyboardInterrupt:
+        os.system('cls' if os.name == 'nt' else 'clear')
+        print(f"\n{'Merry Christmas!!':^{screen_width}}", end='\n\n')
+    
+    finally:
+        # Show cursor again before exiting
+        print("\033[?25h", end='')
 
 
 if __name__ == '__main__':
